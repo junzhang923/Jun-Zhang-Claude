@@ -1,0 +1,6 @@
+{
+  "threshold_pct": 30,
+  "lookback_days": 365,
+  "stocks": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "BRK-B", "JPM", "V", "JNJ", "PG", "KO", "COST", "WMT", "UNH"],
+  "etfs": ["QQQ", "SPY", "VOO"]
+}

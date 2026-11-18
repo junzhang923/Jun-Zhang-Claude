@@ -1,0 +1,51 @@
+name: Drop tracker
+
+on:
+  schedule:
+    - cron: "30 21 * * 1-5"   # weekdays, ~30 min after US market close
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: "Override drop threshold in % (blank = use watchlist.json)"
+        required: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Unit tests
+        run: python -m unittest discover -s drop-tracker/tests
+
+      - name: Check prices
+        run: |
+          ARGS="--json results.json"
+          if [ -n "${{ github.event.inputs.threshold }}" ]; then ARGS="$ARGS --threshold ${{ github.event.inputs.threshold }}"; fi
+          python drop-tracker/tracker.py $ARGS | tee report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build alerts (and optional ntfy push)
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python drop-tracker/notify.py results.json
+
+      - name: Open one issue per new alert
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create drop-alert --color B60205 --description "Stock/ETF drop tracker" 2>/dev/null || true
+          jq -c '.[]' alerts.json | while read -r a; do
+            t=$(echo "$a" | jq -r .ticker)
+            existing=$(gh issue list --label drop-alert --state open --search "in:title \"Drop alert: $t \"" --json title --jq ".[] | select(.title | startswith(\"Drop alert: $t \")) | .title")
+            if [ -n "$existing" ]; then echo "Already open for $t, skipping"; continue; fi
+            echo "$a" | jq -r .body > body.md
+            gh issue create --title "$(echo "$a" | jq -r .title)" --body-file body.md --label drop-alert --assignee "${{ github.repository_owner }}"
+          done
