@@ -14,7 +14,7 @@ charts every day.
 - [x] Tracker measures each ticker's drop from its 52-week high
 - [x] Watchlist covers stable blue chips (Dividend Aristocrats, beta < 1, >$75B, plus BRK-B) and QQQ, SPY, VOO; editable
 - [x] Threshold is configurable (default 30%)
-- [ ] Runs automatically on a schedule and notifies Jun (after the PR merges)
+- [x] Runs automatically on a schedule and notifies Jun
 
 ## Constraints
 - Read-only: never places trades.
@@ -26,12 +26,12 @@ charts every day.
 - [x] Notification step (GitHub issue per alert, optional ntfy)
 - [x] Scheduled GitHub Action and README section
 ### Milestone 2: Go live
-- [ ] Jun merges the PR
-- [ ] Trigger "Drop tracker" once by hand from the Actions tab and check the run summary
+- [x] Jun merges the PR
+- [x] Trigger "Drop tracker" once by hand from the Actions tab and check the run summary
 - [ ] Optional: add `NTFY_TOPIC` secret for phone pushes
 
 ## Next step
-Jun: merge the PR, then run the workflow once by hand to confirm it works.
+None required. The tracker runs each weekday after the close. Optional: add the `NTFY_TOPIC` secret for phone pushes; review the stock list yearly.
 
 ## Decisions
 - 2026-11-18: Measure the drop from the 52-week high (not purchase price or a single day's move).
@@ -46,5 +46,7 @@ Jun: merge the PR, then run the workflow once by hand to confirm it works.
 
 - 2026-11-18: Narrowed the watchlist to stable blue chips. Snapshot on 2026-11-17
   closes: nothing past 30%; closest are LOW (-24.8%), ABT (-20.7%), MCD (-19.3%), PEP (-17.2%).
+- 2026-11-18: PR #1 merged. First live run (Actions run 44310905924) fetched all 17
+  tickers; no alerts. Closest: LOW -24.8%, ABT -20.7%, MCD -19.3%.
 
 ## Lessons
