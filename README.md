@@ -33,3 +33,43 @@ The agent can use any tool the session has: code, web search, files, and
 connected services. It always asks before doing anything that is hard to undo
 or reaches outside the repo, and it never places trades or moves money without
 your explicit confirmation.
+
+## Drop tracker (stocks + ETFs)
+
+A small tracker in `drop-tracker/` that watches stable, long-established stocks and index
+ETFs and notifies you when one falls **30% or more below its 52-week high**.
+
+- **Watchlist and threshold:** edit `drop-tracker/watchlist.json`. It holds
+  `threshold_pct` (default 30), `lookback_days` (default 365, i.e. 52-week
+  high), a `stocks` list and an `etfs` list (QQQ, plus SPY and VOO for the
+  S&P 500). Use Yahoo-style tickers (`BRK-B`).
+- **Which stocks, and why:** the default list is companies with a long record
+  of being stable, so a 30% drop is unusual and worth a look. Each one meets
+  all three of these:
+  1. **Large and established:** market cap over $75B.
+  2. **Steady through bad times:** 25+ consecutive years of dividend increases
+     (an S&P 500 "Dividend Aristocrat"). Raising the payout every year through
+     the 2000-02 crash, 2008-09 and 2020 takes steady earnings.
+  3. **Lower volatility than the market:** beta under 1 when picked.
+
+  That gives JNJ, PG, KO, PEP, WMT, MCD, ABT, CL, ADP, ITW, LOW, CB and SPGI,
+  plus Berkshire Hathaway (BRK-B), which pays no dividend but has a 60-year
+  low-volatility record. Fast-moving growth names (NVDA, META, etc.) and
+  commodity-driven energy stocks are left out on purpose. Re-check the list
+  once a year: a company that cuts its dividend should come off.
+- **Schedule:** `.github/workflows/drop-tracker.yml` runs every weekday about
+  30 minutes after the US close. You can also run it by hand from the Actions
+  tab ("Drop tracker" → Run workflow), optionally with a different threshold.
+- **Notifications:** for each ticker past the threshold, the workflow opens a
+  GitHub issue labelled `drop-alert` and assigns it to you, so GitHub emails
+  and pushes it to your phone. While that issue is open, the ticker won't
+  re-alert; close it once you've reviewed it. For instant phone pushes, also
+  add a repo secret `NTFY_TOPIC` with a private topic name and subscribe to it
+  in the free [ntfy](https://ntfy.sh) app.
+- **Report:** every run writes the full table (price, high, % drop) to the
+  workflow run summary.
+- **Run locally:** `python drop-tracker/tracker.py` (standard library only;
+  prices come from Yahoo Finance with Stooq as fallback). Tests:
+  `python -m unittest discover -s drop-tracker/tests`.
+
+It only reads prices and sends alerts. It never places trades.
