@@ -1,6 +1,7 @@
 {
   "threshold_pct": 30,
   "lookback_days": 365,
-  "stocks": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "BRK-B", "JPM", "V", "JNJ", "PG", "KO", "COST", "WMT", "UNH"],
+  "selection_criteria": "Stable blue chips: (1) large cap, over $75B; (2) 25+ consecutive years of dividend increases (S&P 500 Dividend Aristocrat), which means steady earnings through 2000-02, 2008-09 and 2020; (3) beta under 1 on TradingView when picked (Nov 2026). Berkshire Hathaway is the one exception to (2): it pays no dividend but has a 60-year low-volatility record. Edit freely.",
+  "stocks": ["JNJ", "PG", "KO", "PEP", "WMT", "MCD", "ABT", "CL", "ADP", "ITW", "LOW", "CB", "SPGI", "BRK-B"],
   "etfs": ["QQQ", "SPY", "VOO"]
 }
